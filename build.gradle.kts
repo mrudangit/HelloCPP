@@ -10,6 +10,8 @@ val projectCfg = config["project"] as Map<*, *>
 val buildCfg   = config["build"]   as Map<*, *>
 val packageCfg = config["package"] as Map<*, *>
 
+val isWindows = OperatingSystem.current().isWindows
+
 val projectName    = projectCfg["name"]    as String
 val projectVersion = projectCfg["version"] as String
 val buildDir       = buildCfg["buildDir"]       as String
@@ -19,8 +21,6 @@ val conanProfileDefault = if (isWindows) buildCfg["conanProfileWindows"] as Stri
                           else buildCfg["conanProfileLinux"] as String
 val conanProfile       = project.findProperty("conanProfile") as String? ?: conanProfileDefault
 val packageName    = packageCfg["name"]         as String
-
-val isWindows = OperatingSystem.current().isWindows
 
 // ---------------------------------------------------------------------------
 // Helper – pick the right shell command
@@ -51,7 +51,7 @@ tasks.register<Exec>("cmakeConfigure") {
     description = "Configure the CMake project"
     dependsOn("conanInstall")
 
-    val toolchainFile = "$buildDir/build/generators/conan_toolchain.cmake"
+    val toolchainFile = "$buildDir/conan_toolchain.cmake"
 
     commandLine(
         shellExec(
