@@ -6,7 +6,9 @@
     "build": {
         "buildDir": "build",
         "cmakeBuildType": "Release",
-        "conanProfile": "default"
+        "conanProfileDir": "conan/profiles",
+        "conanProfileWindows": "default",
+        "conanProfileLinux": "gcc14"
     },
     "package": {
         "name": "hellocpp",

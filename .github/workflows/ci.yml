@@ -33,10 +33,6 @@ jobs:
         run: |
           pip3 install conan==2.12.0
 
-      - name: Detect Conan default profile
-        run: |
-          conan profile detect --force
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -59,9 +55,6 @@ jobs:
 
       - name: Install Conan
         run: pip install conan==2.12.0
-
-      - name: Detect Conan default profile
-        run: conan profile detect --force
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -89,24 +82,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install gcc-toolset-13 and dependencies
+      - name: Install gcc-toolset-14 and dependencies
         run: |
-          dnf install -y gcc-toolset-13 gcc-toolset-13-gcc-c++ cmake make python3 python3-pip java-17-openjdk wget
+          dnf install -y gcc-toolset-14 gcc-toolset-14-gcc-c++ cmake make python3 python3-pip java-17-openjdk wget
 
       - name: Install Conan
         run: pip3 install conan==2.12.0
 
-      - name: Detect Conan default profile
-        run: |
-          source /opt/rh/gcc-toolset-13/enable
-          conan profile detect --force
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build, Test & Package (gcc-toolset-13)
+      - name: Build, Test & Package (gcc-toolset-14)
         run: |
-          source /opt/rh/gcc-toolset-13/enable
+          source /opt/rh/gcc-toolset-14/enable
           chmod +x gradlew
           ./gradlew buildAll
 

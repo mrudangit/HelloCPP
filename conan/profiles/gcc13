@@ -1,0 +1,11 @@
+[settings]
+arch=x86_64
+build_type=Release
+compiler=gcc
+compiler.cppstd=17
+compiler.libcxx=libstdc++11
+compiler.version=13.2
+os=Linux
+
+[conf]
+tools.build:compiler_executables={"c": "/opt/rh/gcc-toolset-13/root/usr/bin/gcc", "cpp": "/opt/rh/gcc-toolset-13/root/usr/bin/g++"}

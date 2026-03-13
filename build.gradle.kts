@@ -14,7 +14,10 @@ val projectName    = projectCfg["name"]    as String
 val projectVersion = projectCfg["version"] as String
 val buildDir       = buildCfg["buildDir"]       as String
 val cmakeBuildType = buildCfg["cmakeBuildType"] as String
-val conanProfile   = buildCfg["conanProfile"]   as String
+val conanProfileDir    = buildCfg["conanProfileDir"]    as String
+val conanProfileDefault = if (isWindows) buildCfg["conanProfileWindows"] as String
+                          else buildCfg["conanProfileLinux"] as String
+val conanProfile       = project.findProperty("conanProfile") as String? ?: conanProfileDefault
 val packageName    = packageCfg["name"]         as String
 
 val isWindows = OperatingSystem.current().isWindows
@@ -35,7 +38,7 @@ tasks.register<Exec>("conanInstall") {
 
     commandLine(
         shellExec(
-            "conan install . --output-folder=$buildDir --build=missing --profile=$conanProfile"
+            "conan install . --output-folder=$buildDir --build=missing --profile=$conanProfileDir/$conanProfile"
         )
     )
 }
