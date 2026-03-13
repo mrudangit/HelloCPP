@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y software-properties-common wget curl
+          add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          apt-get update
+          apt-get install -y gcc-13 g++-13 make python3 python3-pip openjdk-17-jdk
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+
+      - name: Install CMake
+        run: |
+          wget -qO- https://github.com/Kitware/CMake/releases/download/v3.28.1/cmake-3.28.1-linux-x86_64.tar.gz | tar xzf - --strip-components=1 -C /usr/local
+
+      - name: Install Conan
+        run: |
+          pip3 install conan==2.12.0
+
+      - name: Detect Conan default profile
+        run: |
+          conan profile detect --force
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build, Test & Package
+        run: |
+          chmod +x gradlew
+          ./gradlew buildAll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hellocpp-linux
+          path: build/hellocpp-*-linux.tar.gz
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Conan
+        run: pip install conan==2.12.0
+
+      - name: Detect Conan default profile
+        run: conan profile detect --force
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build, Test & Package
+        run: ./gradlew.bat buildAll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hellocpp-windows
+          path: build/hellocpp-*-windows.zip
+
+  build-rhel:
+    runs-on: ubuntu-latest
+    container:
+      image: rockylinux:9
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gcc-toolset-13 and dependencies
+        run: |
+          dnf install -y gcc-toolset-13 gcc-toolset-13-gcc-c++ cmake make python3 python3-pip java-17-openjdk wget
+
+      - name: Install Conan
+        run: pip3 install conan==2.12.0
+
+      - name: Detect Conan default profile
+        run: |
+          source /opt/rh/gcc-toolset-13/enable
+          conan profile detect --force
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build, Test & Package (gcc-toolset-13)
+        run: |
+          source /opt/rh/gcc-toolset-13/enable
+          chmod +x gradlew
+          ./gradlew buildAll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hellocpp-rhel
+          path: build/hellocpp-*-linux.tar.gz
